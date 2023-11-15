@@ -1,0 +1,38 @@
+name: Build and Release binary
+permissions: write-all
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: 
+      - 'v*.*.*'
+  pull_request:
+    branches: [ "main" ] 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Tree
+        uses: actions/checkout@v3
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v1.13
+        with:
+          cmake-version: '3.25.1'
+      - name: Use cmake
+        run: cmake --version
+ 
+      - name: Build 
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make
+          cd ..
+      - name: Release 
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./build/grp
+          tag_name: 'v1.0.0'
+          generate_release_notes: true
+          prerelease: false
